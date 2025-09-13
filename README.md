@@ -123,6 +123,18 @@ Testez la connexion depuis votre machine locale :
 kubectl get nodes
 # Vous devriez voir le nœud de votre serveur EC2.
 ```
+### Installation helm
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install curl -y
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+helm version
+helm repo add stable https://charts.helm.sh/stable
+helm repo update
+helm version
+# Vous devriez voir la version de votre helm installé.
+```
+<img width="1215" height="50" alt="image" src="https://github.com/user-attachments/assets/81ce7b42-b4f1-4a84-a2f9-7c296a18f3c9" />
 
 ### Installation d'ArgoCD avec Helm
 
