@@ -151,8 +151,12 @@ helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 
 # 4. Installer ArgoCD
-helm install argocd argo/argo-cd --namespace argocd
+helm install argocd argo/argo-cd --namespace argocd --kubeconfig /etc/rancher/k3s/k3s.yaml
+# vérification installation Argocd
+kubectl get pod -n argocd
 ```
+<img width="1283" height="364" alt="image" src="https://github.com/user-attachments/assets/e424f1ad-1490-4129-9b93-6afc44ff8eeb" />
+<img width="862" height="175" alt="image" src="https://github.com/user-attachments/assets/43643681-52a9-48e8-a50d-0bad80733f26" />
 
 ### Accès à l'interface ArgoCD
 
@@ -160,10 +164,11 @@ Pour des raisons de sécurité, le serveur d'API d'ArgoCD n'est pas exposé par 
 
 ```bash
 # Dans un nouveau terminal, lancez cette commande. Elle doit rester active.
-kubectl port-forward svc/argocd-server -n argocd 8080:443
+kubectl port-forward --address 0.0.0.0 svc/argocd-server -n argocd 8080:443
 ```
 
-Ouvrez votre navigateur et allez sur `https://localhost:8080`. Ignorez l'avertissement de sécurité (le certificat est auto-signé).
+Ouvrez votre navigateur et allez sur `[https://VOTRE_IP_PUBLIC:8080](https://52.23.201.142:8080)`. Ignorez l'avertissement de sécurité (le certificat est auto-signé).
+<img width="1286" height="681" alt="image" src="https://github.com/user-attachments/assets/b753a849-4a74-4a38-94f4-d9daa372a3ad" />
 
 Le nom d'utilisateur est `admin`. Pour obtenir le mot de passe initial :
 
@@ -171,8 +176,10 @@ Le nom d'utilisateur est `admin`. Pour obtenir le mot de passe initial :
 # Ce mot de passe est stocké dans un secret Kubernetes
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
+<img width="1226" height="48" alt="image" src="https://github.com/user-attachments/assets/589a462b-5d3b-4c80-be01-1d70f4deea01" />
 
 Connectez-vous. Vous êtes sur le tableau de bord d'ArgoCD !
+<img width="1273" height="692" alt="image" src="https://github.com/user-attachments/assets/d3d32f92-20bc-4e88-81b0-6211a8486f60" />
 
 ## 4. Atelier 2 : Déploiement d'Applications avec ArgoCD
 
