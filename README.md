@@ -216,6 +216,8 @@ Pour cet atelier, notre entreprise a déjà "packagé" Odoo dans sa propre chart
     *   **Cochez `Prune Resources`** : Imaginez que vous supprimez une ressource (un Service, un ConfigMap) de votre charte Helm. Sans cette option, la ressource continuerait d'exister dans le cluster. `Prune` s'assure qu'ArgoCD supprime les ressources qui n'existent plus dans Git, évitant ainsi les "ressources orphelines".
     *   **Cochez `Self Heal`** : C'est la garantie anti-dérive. Si un administrateur (ou vous-même par erreur) modifie une ressource en direct avec `kubectl` (par exemple, changer le nombre de réplicas), ArgoCD le détectera comme une déviation par rapport à la source de vérité (Git) et **annulera automatiquement** ce changement. Le cluster "s'auto-guérira" pour revenir à l'état décrit dans Git.
 
+<img width="1915" height="549" alt="image" src="https://github.com/user-attachments/assets/3f3f9a52-65b4-48ed-9183-60bf5ba91abc" />
+
 4.  **Définissez la Source de l'application :**
     *   **Repository URL** : `https://github.com/nzapanarcisse/datascientest-chart.git` (L'URL de notre charte Helm d'entreprise).
     *   **Revision** : `HEAD` (Indique à ArgoCD de toujours suivre la dernière version de la branche par défaut).
@@ -225,17 +227,22 @@ Pour cet atelier, notre entreprise a déjà "packagé" Odoo dans sa propre chart
     *   **Cluster URL** : `https://kubernetes.default.svc` (L'alias pour le cluster sur lequel ArgoCD est lui-même installé).
     *   **Namespace** : `odoo` (Nous déploierons Odoo dans son propre espace de noms pour l'isoler des autres applications).
 
+<img width="1884" height="813" alt="image" src="https://github.com/user-attachments/assets/73cb0430-b037-4235-b4f4-650d76bb1c35" />
+
 6.  **Paramètres de la Charte Helm :**
     *   Dans la section **Helm**, cliquez sur `Parameters`. Nous devons indiquer à notre charte de créer le namespace pour nous (cette option est spécifique à la charte Bitnami que nous utilisons comme base).
     *   Ajoutez un paramètre : **Name**: `namespace.create`, **Value**: `true`.
 
 7.  **Cliquez sur `CREATE`** en haut de la page.
 
+<img width="1884" height="977" alt="image" src="https://github.com/user-attachments/assets/bce9effe-4bc8-46ec-bc86-5b7c03a41218" />
+
 **Que se passe-t-il ensuite ?**
 
 ArgoCD va d'abord cloner le dépôt Git, puis comparer l'état de la charte Helm avec ce qui existe dans le namespace `odoo` du cluster. Il verra que rien n'existe et marquera l'application comme `OutOfSync`. Puisque nous avons choisi une politique `Automatic`, il va immédiatement commencer le déploiement.
 
 Observez l'application passer par les états `Progressing` puis `Healthy` et `Synced`. Vous pouvez cliquer sur l'application pour explorer toutes les ressources Kubernetes (Deployments, Services, PersistentVolumeClaims, etc.) qui ont été créées, le tout sans une seule ligne de `kubectl` !
+<img width="698" height="783" alt="image" src="https://github.com/user-attachments/assets/361d18a3-d3d5-46a0-8d8d-a95c7f2940c0" />  
 
 ### Cas 2 : Préparation de notre application "Site Vitrine"
 
