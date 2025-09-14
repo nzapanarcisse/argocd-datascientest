@@ -242,7 +242,31 @@ Pour cet atelier, notre entreprise a déjà "packagé" Odoo dans sa propre chart
 ArgoCD va d'abord cloner le dépôt Git, puis comparer l'état de la charte Helm avec ce qui existe dans le namespace `odoo` du cluster. Il verra que rien n'existe et marquera l'application comme `OutOfSync`. Puisque nous avons choisi une politique `Automatic`, il va immédiatement commencer le déploiement.
 
 Observez l'application passer par les états `Progressing` puis `Healthy` et `Synced`. Vous pouvez cliquer sur l'application pour explorer toutes les ressources Kubernetes (Deployments, Services, PersistentVolumeClaims, etc.) qui ont été créées, le tout sans une seule ligne de `kubectl` !
-<img width="698" height="783" alt="image" src="https://github.com/user-attachments/assets/361d18a3-d3d5-46a0-8d8d-a95c7f2940c0" />  
+
+<img width="1299" height="508" alt="image" src="https://github.com/user-attachments/assets/fb66e28f-ccff-473a-830c-4d0ed67ea85f" />
+
+En cliquant sur votre application Odoo depuis le tableau de bord Argo, vous pouvez voir les ressources en cours de création sur votre cluster.
+
+<img width="1296" height="609" alt="image" src="https://github.com/user-attachments/assets/a054e4d9-2254-4fb0-9a29-e5c28db6feef" />
+
+Vous pouvez aussi vous connecter à votre cluster et vérifier la création de ces ressources.
+
+<img width="1285" height="230" alt="image" src="https://github.com/user-attachments/assets/de614c8c-c09f-4ea2-bb7c-c9fb5c31b0a2" />
+
+Félicitations pour votre succès ! À ce stade, chaque fois qu'une modification sera apportée au dépôt datascientest-chart, Argo CD détectera ces changements et les appliquera sur le cluster. De plus, si un développeur ou un administrateur tente de modifier une ressource directement sur le cluster, Argo CD annulera cette modification. Par exemple, j'ai changé le type de service de LoadBalancer à ClusterIP (car je n'ai pas d'Ingress sur mon cluster). Une fois le commit effectué, Argo CD appliquera cette modification directement sur le cluster.
+
+<img width="1275" height="392" alt="image" src="https://github.com/user-attachments/assets/39707a1e-40af-44ba-8335-a2ae2e06ae8e" />
+
+<img width="1306" height="596" alt="image" src="https://github.com/user-attachments/assets/943c0e7e-a957-471b-bdd7-55de235ed6cb" />
+
+Pour accéder à notre application, nous allons utiliser le port forwarding sur le port 8069, car celle-ci est exposée via un service ClusterIP.
+```bash
+# Dans un nouveau terminal, lancez cette commande. Elle doit rester active.
+kubectl port-forward --address 0.0.0.0 svc/odoo -n odoo 8069:8069
+```
+<img width="1277" height="55" alt="image" src="https://github.com/user-attachments/assets/778df4d1-bd5f-4c96-aa0f-d1c40d9b2e4d" />
+
+<img width="1274" height="637" alt="image" src="https://github.com/user-attachments/assets/634da12e-20d7-491b-bab0-2a50660beef3" />
 
 ### Cas 2 : Préparation de notre application "Site Vitrine"
 
