@@ -150,9 +150,11 @@ helm repo add argo https://argoproj.github.io/argo-helm
 # 3. Mettre à jour les dépôts
 helm repo update
 
-# 4. Installer ArgoCD
-helm install argocd argo/argo-cd --namespace argocd --kubeconfig /etc/rancher/k3s/k3s.yaml
-# vérification installation Argocd
+# 4. Installer ArgoCD avec les options de ligne de commande
+helm install argocd argo/argo-cd --namespace argocd --kubeconfig /etc/rancher/k3s/k3s.yaml \
+  --set server.service.type=NodePort
+
+# Vérification de l'installation d'ArgoCD
 kubectl get pod -n argocd
 ```
 <img width="1283" height="364" alt="image" src="https://github.com/user-attachments/assets/e424f1ad-1490-4129-9b93-6afc44ff8eeb" />
@@ -160,15 +162,11 @@ kubectl get pod -n argocd
 
 ### Accès à l'interface ArgoCD
 
-Pour des raisons de sécurité, le serveur d'API d'ArgoCD n'est pas exposé par défaut. Nous allons utiliser le port-forwarding pour y accéder.
+Vérifiez que le service créé par votre stack Argo est bien exposé sur le port 30080.
+Ouvrez votre navigateur et allez sur `[https://VOTRE_IP_PUBLIC:30080](https://54.234.45.177:30080)`. Ignorez l'avertissement de sécurité (le certificat est auto-signé).
 
-```bash
-# Dans un nouveau terminal, lancez cette commande. Elle doit rester active.
-kubectl port-forward --address 0.0.0.0 svc/argocd-server -n argocd 8080:443
-```
+<img width="1906" height="759" alt="image" src="https://github.com/user-attachments/assets/49b22cb7-954b-4707-9616-9620ad569da6" />
 
-Ouvrez votre navigateur et allez sur `[https://VOTRE_IP_PUBLIC:8080](https://52.23.201.142:8080)`. Ignorez l'avertissement de sécurité (le certificat est auto-signé).
-<img width="1286" height="681" alt="image" src="https://github.com/user-attachments/assets/b753a849-4a74-4a38-94f4-d9daa372a3ad" />
 
 Le nom d'utilisateur est `admin`. Pour obtenir le mot de passe initial :
 
@@ -179,7 +177,9 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 <img width="1226" height="48" alt="image" src="https://github.com/user-attachments/assets/589a462b-5d3b-4c80-be01-1d70f4deea01" />
 
 Connectez-vous. Vous êtes sur le tableau de bord d'ArgoCD !
-<img width="1273" height="692" alt="image" src="https://github.com/user-attachments/assets/d3d32f92-20bc-4e88-81b0-6211a8486f60" />
+
+<img width="1911" height="778" alt="image" src="https://github.com/user-attachments/assets/33bb4545-1e3e-4163-b3c7-8a9bf0d6fbf3" />
+
 
 ## 4. Atelier 2 : Déploiement d'Applications 
 
@@ -237,7 +237,8 @@ Pour cet atelier, notre entreprise a déjà "packagé" Odoo dans sa propre chart
 
 7.  **Cliquez sur `CREATE`** en haut de la page.
 
-<img width="1884" height="977" alt="image" src="https://github.com/user-attachments/assets/bce9effe-4bc8-46ec-bc86-5b7c03a41218" />
+<img width="1905" height="889" alt="image" src="https://github.com/user-attachments/assets/12dc198f-34f8-4c87-a29c-4a7fcb078c3c" />
+
 
 **Que se passe-t-il ensuite ?**
 
@@ -255,21 +256,37 @@ Vous pouvez aussi vous connecter à votre cluster et vérifier la création de c
 
 <img width="1285" height="230" alt="image" src="https://github.com/user-attachments/assets/de614c8c-c09f-4ea2-bb7c-c9fb5c31b0a2" />
 
-Félicitations pour votre succès ! À ce stade, chaque fois qu'une modification sera apportée au dépôt datascientest-chart, Argo CD détectera ces changements et les appliquera sur le cluster. De plus, si un développeur ou un administrateur tente de modifier une ressource directement sur le cluster, Argo CD annulera cette modification. Par exemple, j'ai changé le type de service de LoadBalancer à ClusterIP (car je n'ai pas d'Ingress sur mon cluster). Une fois le commit effectué, Argo CD appliquera cette modification directement sur le cluster.
+Félicitations pour votre succès ! À ce stade, chaque fois qu'une modification sera apportée au dépôt datascientest-chart, Argo CD détectera ces changements et les appliquera sur le cluster. De plus, si un développeur ou un administrateur tente de modifier une ressource directement sur le cluster, Argo CD annulera cette modification.
 
-<img width="1275" height="392" alt="image" src="https://github.com/user-attachments/assets/39707a1e-40af-44ba-8335-a2ae2e06ae8e" />
+<img width="1914" height="487" alt="image" src="https://github.com/user-attachments/assets/9f1a4096-af81-4572-bbfd-8910c43a331f" />
+
 
 <img width="1306" height="596" alt="image" src="https://github.com/user-attachments/assets/943c0e7e-a957-471b-bdd7-55de235ed6cb" />
 
-Pour accéder à notre application, nous allons utiliser le port forwarding sur le port 8069, car celle-ci est exposée via un service ClusterIP.
+Ouvrez votre navigateur et allez sur `[http://VOTRE_IP_PUBLIC:30089](https://54.234.45.177:30089)`(vérifiz que ce port est bien ouvert sur votre groupe de sécurité)
+
+![Uploading image.png…]()
+
 ```bash
-# Dans un nouveau terminal, lancez cette commande. Elle doit rester active.
-kubectl port-forward --address 0.0.0.0 svc/odoo -n odoo 8069:8069
+# Ce mot de passe est stocké dans un secret Kubernetes
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
-<img width="1277" height="55" alt="image" src="https://github.com/user-attachments/assets/778df4d1-bd5f-4c96-aa0f-d1c40d9b2e4d" />
+<img width="1226" height="48" alt="image" src="https://github.com/user-attachments/assets/589a462b-5d3b-4c80-be01-1d70f4deea01" />
 
-<img width="1274" height="637" alt="image" src="https://github.com/user-attachments/assets/634da12e-20d7-491b-bab0-2a50660beef3" />
+Connectez-vous. Vous êtes sur le tableau de bord d'ArgoCD !
 
+<img width="1911" height="778" alt="image" src="https://github.com/user-attachments/assets/33bb4545-1e3e-4163-b3c7-8a9bf0d6fbf3" />
+
+Récupérez le mot de passe d'Odoo à partir du secret Odoo créé par la stack en exécutant la commande suivante :
+```bash
+kubectl -n odoo get secret odoo -o jsonpath="{.data.odoo-password}" | base64 -d
+```
+<img width="1892" height="37" alt="image" src="https://github.com/user-attachments/assets/3651a9a7-d13c-4ff2-9514-3da18fe02cfa" />
+
+user:user@example.com
+dz6UiV0NUR
+
+<img width="1913" height="996" alt="image" src="https://github.com/user-attachments/assets/b2b4afbc-e8de-4410-8331-4ef882468126" />
 
 ### Cas 2 : Déploiement d'une Application Web (Chart Helm Interne)
 
