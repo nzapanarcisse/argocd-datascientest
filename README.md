@@ -181,7 +181,9 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 Connectez-vous. Vous êtes sur le tableau de bord d'ArgoCD !
 <img width="1273" height="692" alt="image" src="https://github.com/user-attachments/assets/d3d32f92-20bc-4e88-81b0-6211a8486f60" />
 
-## 4. Atelier 2 : Déploiement d'Applications avec ArgoCD
+## 4. Atelier 2 : Déploiement d'Applications 
+
+ArgoCD est extrêmement flexible. Il peut déployer des applications à partir de différentes sources de manifestes. Dans cet atelier, nous allons explorer les scénarios courants qui illustrent cette flexibilité à savoir helm et les manifest yaml.
 
 ### Cas 1 : Déploiement d'Odoo 18 avec GitOps
 
@@ -268,225 +270,245 @@ kubectl port-forward --address 0.0.0.0 svc/odoo -n odoo 8069:8069
 
 <img width="1274" height="637" alt="image" src="https://github.com/user-attachments/assets/634da12e-20d7-491b-bab0-2a50660beef3" />
 
-### Cas 2 : Préparation de notre application "Site Vitrine"
 
-Maintenant, nous allons déployer notre propre application. Le code se trouve dans le dossier `app/`.
+### Cas 2 : Déploiement d'une Application Web (Chart Helm Interne)
 
-#### Création du code source et des manifestes Kubernetes
+**Le Contexte : Standardisation des Déploiements**
 
-Créez la structure de fichiers suivante sur votre machine :
+Continuons notre scénario. L'entreprise, satisfaite du déploiement d'Odoo, souhaite maintenant déployer sa propre application web. L'équipe "Plateforme" (dont nous faisons partie) veut standardiser les déploiements. Elle impose l'utilisation de **Helm** pour toutes les nouvelles applications, car cela permet de créer des "modèles" de déploiement réutilisables et de gérer la configuration de manière centralisée.
 
-```
-argocd-course/
-├── app/
-│   ├── index.html
-│   └── style.css
-├── k8s/
-│   ├── deployment.yaml
-│   └── service.yaml
-└── Dockerfile
-```
+Notre mission est de packager l'application web (dont le code source se trouve dans le dossier `app/` de ce projet) dans une charte Helm et de la déployer avec ArgoCD.
 
-**`app/index.html`**:
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>ArgoCD Rocks!</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Bienvenue sur notre Site Vitrine !</h1>
-        <p>Cette application est déployée avec la magie de GitOps et ArgoCD.</p>
-        <p class="version">Version: 1.0.0</p>
-    </div>
-</body>
-</html>
-```
+**La Solution : Une Charte Helm pour notre App**
 
-**`app/style.css`**:
-```css
-body { font-family: sans-serif; background: #f0f8ff; text-align: center; }
-.container { max-width: 800px; margin: 50px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-h1 { color: #333; }
-.version { font-size: 0.8em; color: #888; }
-```
+Nous avons déjà créé une charte Helm pour cette application et l'avons placée dans le même dépôt Git que la charte Odoo, mais dans un autre dossier.
 
-**`Dockerfile`**:
-```dockerfile
-# Stage 1: Utiliser une image Nginx pour servir nos fichiers statiques
-FROM nginx:1.25-alpine
+*   **Source de la charte :** `https://github.com/nzapanarcisse/datascientest-chart.git`
+*   **Chemin dans le dépôt :** `webapp/webapp-chart`
 
-# Copier les fichiers de notre site web dans le répertoire servi par Nginx
-COPY app/ /usr/share/nginx/html
+**Déployons notre application web avec sa charte Helm :**
 
-# Exposer le port 80
-EXPOSE 80
-
-# La commande par défaut de l'image Nginx est déjà de démarrer le serveur
-```
-
-**`k8s/deployment.yaml`**:
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: site-vitrine-deployment
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: site-vitrine
-  template:
-    metadata:
-      labels:
-        app: site-vitrine
-    spec:
-      containers:
-      - name: site-vitrine
-        # REMPLACEZ par votre nom d'utilisateur DockerHub/GHCR
-        image: VOTRE_USER/site-vitrine:latest
-        ports:
-        - containerPort: 80
-```
-
-**`k8s/service.yaml`**:
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: site-vitrine-service
-spec:
-  selector:
-    app: site-vitrine
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  type: NodePort # Simple pour le test, en production on utiliserait un Ingress
-```
-
-#### Création du dépôt GitHub
-
-1.  Créez un nouveau dépôt **privé** sur GitHub (ex: `argocd-site-vitrine`).
-2.  Poussez le contenu de votre dossier `argocd-course` dans ce nouveau dépôt.
-
-```bash
-# Dans le dossier argocd-course
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/VOTRE_USER/argocd-site-vitrine.git
-git push -u origin main
-```
-
-### Cas 3 : Déploiement du "Site Vitrine" via l'UI (Dépôt Git Privé)
-
-1.  **Connecter votre dépôt Git à ArgoCD :**
-    *   Allez dans `Settings` > `Repositories`.
-    *   Cliquez sur `CONNECT REPO USING HTTPS`.
-    *   **Type**: `git`
-    *   **Project**: `default`
-    *   **Repository URL**: L'URL HTTPS de votre dépôt (`https://github.com/VOTRE_USER/argocd-site-vitrine.git`)
-    *   **Username**: Votre nom d'utilisateur GitHub.
-    *   **Password**: Un **Personal Access Token (PAT)** GitHub. Créez-en un [ici](https://github.com/settings/tokens) avec les droits `repo`.
-    *   Cliquez sur `CONNECT`. ArgoCD va tester la connexion.
-
-2.  **Créer l'application :**
-    *   Cliquez sur `+ NEW APP`.
-    *   **Application Name** : `site-vitrine`
+1.  **Cliquez sur `+ NEW APP`**.
+2.  **Informations Générales :**
+    *   **Application Name** : `webapp-helm`
     *   **Project Name** : `default`
-    *   **Sync Policy** : `Automatic`, `Prune Resources`, `Self Heal`.
-    *   **Source** :
-        *   Sélectionnez votre dépôt dans la liste déroulante.
-        *   **Revision** : `HEAD`
-        *   **Path** : `k8s` (le dossier où se trouvent nos manifestes)
-    *   **Destination** :
-        *   **Cluster URL** : `https://kubernetes.default.svc`
-        *   **Namespace** : `site-vitrine`
-    *   Cliquez sur `CREATE`.
+3.  **Politique de Synchronisation :** `Automatic`, avec `Prune Resources` et `Self Heal`.
+4.  **Source :**
+    *   **Repository URL** : `https://github.com/nzapanarcisse/datascientest-chart.git` (le même dépôt que pour Odoo).
+    *   **Revision** : `HEAD`
+    *   **Path** : `webapp/webapp-chart` (le chemin vers notre nouvelle charte).
+5.  **Destination :**
+    *   **Cluster URL** : `https://kubernetes.default.svc`
+    *   **Namespace** : `webapp`
+6.  **Cliquez sur `CREATE`**.
 
-**Problème :** Le déploiement va échouer (`ImagePullBackOff`). Pourquoi ? Parce que nous n'avons pas encore construit et poussé l'image Docker `VOTRE_USER/site-vitrine:latest`. C'est l'objet de notre prochain atelier !
+ArgoCD va maintenant déployer notre application web en utilisant la charte Helm que nous avons définie. Cela montre comment une entreprise peut gérer ses propres applications packagées de manière standardisée.
 
-## 5. Atelier 3 : Workflow CI/CD Complet avec GitHub Actions
+### Cas 3 : Déploiement d'une Application Web (Manifestes Kubernetes Bruts)
 
-Notre but : quand nous poussons un changement sur la branche `main`, une GitHub Action doit automatiquement :
-1.  Construire l'image Docker.
-2.  La pousser sur un registre (Docker Hub ou GHCR).
-3.  **Mettre à jour le fichier `deployment.yaml` dans Git** avec le nouveau tag de l'image.
-4.  ArgoCD détectera ce changement et déploiera la nouvelle version.
+**Le Contexte : Flexibilité pour les Équipes**
+
+Un mois plus tard, une nouvelle équipe de développement rejoint l'entreprise. Ils ne sont pas encore formés à Helm et trouvent sa syntaxe complexe. Pour leur projet, ils préfèrent utiliser des **manifestes Kubernetes de base** (`deployment.yaml`, `service.yaml`), car c'est un format qu'ils maîtrisent déjà.
+
+Notre rôle, en tant qu'équipe DevOps, est de leur montrer qu'ils peuvent tout de même bénéficier des avantages du GitOps et d'ArgoCD, même sans utiliser Helm.
+
+**La Solution : Le GitOps avec des Manifestes Simples**
+
+Nous avons pris les mêmes composants (un déploiement et un service) et les avons définis dans des fichiers YAML standards. Nous les avons placés dans le même dépôt central, mais dans un chemin différent.
+
+*   **Source des manifestes :** `https://github.com/nzapanarcisse/datascientest-chart.git`
+*   **Chemin dans le dépôt :** `webapp/webapp-manifest`
+
+**Déployons la même application avec des manifestes bruts :**
+
+1.  **Cliquez sur `+ NEW APP`**.
+2.  **Informations Générales :**
+    *   **Application Name** : `webapp-manifest`
+    *   **Project Name** : `default`
+3.  **Politique de Synchronisation :** `Automatic`, avec `Prune Resources` et `Self Heal`.
+4.  **Source :**
+    *   **Repository URL** : `https://github.com/nzapanarcisse/datascientest-chart.git`
+    *   **Revision** : `HEAD`
+    *   **Path** : `webapp/webapp-manifest` (le chemin vers nos fichiers YAML).
+5.  **Destination :**
+    *   **Cluster URL** : `https://kubernetes.default.svc`
+    *   **Namespace** : `webapp-raw` (un namespace différent pour éviter les conflits).
+6.  **Cliquez sur `CREATE`**.
+
+ArgoCD va lire les fichiers `deployment.yaml` et `service.yaml` et les appliquer au cluster. Le résultat final est le même (l'application est déployée), mais nous avons utilisé une méthode différente. Cela prouve aux équipes qu'ArgoCD s'adapte à leurs compétences tout en garantissant une gestion centralisée et basée sur Git.
+
+## 5. Atelier 3 : Automatisation Complète avec un Pipeline CI/CD GitOps
+
+**Le Contexte : Passer à la Vitesse Supérieure**
+
+Félicitations ! Dans l'atelier précédent, nous avons déployé notre application web de deux manières différentes. C'était une étape cruciale pour comprendre le fonctionnement d'ArgoCD. Cependant, le processus était encore manuel. Un développeur modifiait le code, puis un membre de l'équipe DevOps devait manuellement créer une nouvelle image, la pousser, et mettre à jour la configuration dans le dépôt GitOps.
+
+Ce processus est lent, source d'erreurs et ne correspond pas à la vélocité attendue d'une équipe moderne. La direction souhaite maintenant une **automatisation de bout en bout**. L'objectif est simple : **lorsqu'un développeur pousse une modification du code de l'application, celle-ci doit être testée, sécurisée et déployée en production en quelques minutes, sans aucune intervention manuelle.**
+
+C'est ici que la magie du CI/CD couplé au GitOps opère. Nous allons construire un pipeline avec GitHub Actions qui orchestrera tout ce processus.
+
+**La Stratégie : Deux Dépôts pour Deux Responsabilités**
+
+Pour un pipeline GitOps robuste, la meilleure pratique est de séparer les préoccupations en utilisant deux dépôts Git distincts :
+
+1.  **Dépôt Applicatif (`argocd-datascientest`) :** C'est là que vit le code source de notre application web (le dossier `app/`). C'est le terrain de jeu des développeurs. Un `git push` sur ce dépôt déclenchera notre pipeline d'Intégration Continue (CI).
+
+2.  **Dépôt de Configuration/GitOps (`datascientest-chart`) :** Il contient la "vérité" sur l'état de notre infrastructure (nos charts Helm, nos manifestes). C'est le dépôt surveillé par ArgoCD. Seul notre pipeline CI/CD a le droit d'écrire dedans.
+
+![CI/CD GitOps Flow](https://i.imgur.com/gC0m3fC.png)
+
+Ce découplage est fondamental : les développeurs n'ont pas besoin de savoir comment leur code est déployé, et l'équipe Ops garde le contrôle total sur la configuration des déploiements.
 
 ### Mise en place du pipeline GitHub Actions
 
-1.  **Ajoutez des secrets à votre dépôt GitHub :**
-    *   Allez dans `Settings` > `Secrets and variables` > `Actions`.
-    *   Créez les secrets suivants :
-        *   `DOCKERHUB_USERNAME`: Votre nom d'utilisateur Docker Hub.
-        *   `DOCKERHUB_TOKEN`: Un token d'accès de Docker Hub.
+Nous allons maintenant construire le workflow qui réalise ce scénario. Ce pipeline sera déclenché par un push sur le dossier `app/` de notre dépôt applicatif.
 
-2.  **Créez le fichier de workflow :**
-    *   Dans votre dépôt, créez le dossier `.github/workflows/`.
-    *   À l'intérieur, créez un fichier `ci-cd.yml`.
+**1. Création du Fichier de Workflow**
 
-**`.github/workflows/ci-cd.yml`**:
+Dans votre projet `argocd-datascientest`, créez le fichier `.github/workflows/cicd-pipeline.yml` pour le pipeline.
+
+**2. Le Code du Workflow (`.github/workflows/cicd-pipeline.yml`)**
+
+Copiez le code suivant dans votre fichier. Chaque étape est commentée pour que vous, en tant que formateur, puissiez l'expliquer en détail.
+
 ```yaml
-name: CI/CD for Site Vitrine
+name: CI/CD - Pipeline de Déploiement de l'Application Web
 
 on:
+  # Déclencher le workflow uniquement lors d'un push sur la branche main
+  # ET si les changements concernent le code de l'application.
   push:
     branches: [ "main" ]
+    paths:
+      - 'app/**'
 
 jobs:
-  build-and-deploy:
+  build-scan-and-push:
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.generate_tag.outputs.tag }}
+
     steps:
-    - name: Checkout code
+    - name: 1. Récupération du code source
       uses: actions/checkout@v4
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    - name="Set image tag"
-      id: image_tag
+    - name: 2. Génération d'un tag unique pour l'image
+      id: generate_tag
+      # Nous utilisons le hash du commit pour un tag unique et traçable.
       run: echo "tag=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_OUTPUT
 
-    - name: Build and push Docker image
+    - name: 3. Configuration de Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: 4. Connexion à Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: 5. Build de l'image Docker
+      id: docker_build
       uses: docker/build-push-action@v5
       with:
-        context: .
-        push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/site-vitrine:${{ steps.image_tag.outputs.tag }}, ${{ secrets.DOCKERHUB_USERNAME }}/site-vitrine:latest
+        context: . # Le contexte est la racine de notre projet
+        file: ./app/Dockerfile # Spécifier l'emplacement du Dockerfile
+        push: false # Ne pas pousser tout de suite, on scanne d'abord
+        tags: datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}
+        load: true # Charger l'image dans le runner pour le scan
 
-    - name: Update Kubernetes manifest
+    - name: 6. Lancement des tests (Simulation)
       run: |
-        # Remplacer le tag de l'image dans le fichier de déploiement
-        sed -i 's|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/site-vitrine:${{ steps.image_tag.outputs.tag }}|' k8s/deployment.yaml
+        echo "Lancement des tests unitaires et d'intégration..."
+        # Dans un vrai projet, vous auriez ici des commandes comme :
+        # npm test
+        # pytest
+        echo "Tests passés avec succès !"
 
-    - name: Commit and push changes
+    - name: 7. Scan de vulnérabilités avec Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}'
+        format: 'table'
+        # Faire échouer le pipeline si des vulnérabilités HAUTES ou CRITIQUES sont trouvées
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+
+    - name: 8. Push de l'image sur Docker Hub (si le scan est réussi)
+      run: docker push datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}
+
+  # --- Job de Déploiement Continu (CD) ---
+  trigger-argocd-sync:
+    # Ce job ne démarre que si le précédent a réussi
+    needs: build-scan-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1. Checkout du dépôt de Configuration (GitOps)
+      uses: actions/checkout@v4
+      with:
+        # C'est ici que la magie opère : on checkout le DEUXIÈME dépôt
+        repository: nzapanarcisse/datascientest-chart
+        # On a besoin d'un PAT pour pouvoir pousser les changements
+        token: ${{ secrets.GITOPS_PAT }}
+
+    - name: 2. Mise à jour du tag de l'image dans le chart Helm
       run: |
-        git config --global user.name 'GitHub Actions'
+        # On utilise sed pour remplacer la valeur du tag dans le values.yaml
+        # C'est le "déclencheur" pour ArgoCD
+        sed -i "s/^  tag: .*/  tag: ${{needs.build-scan-and-push.outputs.image_tag}}/" webapp/webapp-chart/values.yaml
+
+    - name: 3. Commit et Push des changements vers le dépôt GitOps
+      run: |
+        git config --global user.name 'GitHub Actions Bot'
         git config --global user.email 'actions@github.com'
-        git add k8s/deployment.yaml
-        # Vérifier s'il y a des changements à commiter
-        git diff --staged --quiet || git commit -m "Update image tag to ${{ steps.image_tag.outputs.tag }}"
+        git add webapp/webapp-chart/values.yaml
+        # On ne commit que s'il y a un réel changement
+        git diff --staged --quiet || git commit -m "CI: Mise à jour de l'image webapp vers le tag ${{needs.build-scan-and-push.outputs.image_tag}}"
         git push
 ```
 
-### Démonstration du workflow automatisé
+**3. Configuration des Secrets**
 
-1.  **Poussez le fichier de workflow** sur votre branche `main`.
-2.  Allez dans l'onglet `Actions` de votre dépôt GitHub. Vous verrez le workflow s'exécuter. Il va construire, pousser l'image, puis commiter un changement dans `k8s/deployment.yaml`.
-3.  Retournez sur l'interface d'ArgoCD. Cliquez sur le bouton `Refresh` de l'application `site-vitrine`. ArgoCD va détecter que le commit dans Git a changé.
-4.  L'application passera à `OutOfSync`. Comme la politique de synchronisation est `Automatic`, ArgoCD va automatiquement appliquer le nouveau manifeste, créant un nouveau ReplicaSet avec les pods utilisant la nouvelle image.
-5.  **Faites un changement !** Modifiez le fichier `app/index.html` (par exemple, changez la version en "2.0.0").
-6.  `git commit` et `git push`.
-7.  Observez la magie : GitHub Actions se déclenche, met à jour l'image et le manifeste. ArgoCD voit le changement et déploie la nouvelle version. **Vous venez de mettre en place un vrai workflow GitOps !**
+Ce pipeline a besoin de trois secrets pour fonctionner. Allez dans votre dépôt `argocd-datascientest`, puis dans `Settings > Secrets and variables > Actions` et ajoutez les secrets suivants :
+
+*   `DOCKER_USERNAME`: `datascientestuser`
+*   `DOCKER_PASSWORD`: `datascientestuser`
+*   `GITOPS_PAT`: Il s'agit d'un **Personal Access Token (PAT)** de GitHub. C'est crucial.
+    *   Allez dans les [paramètres de votre compte GitHub](https://github.com/settings/tokens) > `Personal access tokens` > `Tokens (classic)`.
+    *   Générez un nouveau token.
+    *   Donnez-lui un nom (ex: `argocd-trigger`).
+    *   **Cochez la case `repo`** pour lui donner les droits de lire et écrire dans vos dépôts.
+    *   Copiez ce token et collez-le comme valeur pour le secret `GITOPS_PAT`.
+
+### Démonstration du Workflow Automatisé
+
+Maintenant, il est temps de voir la magie opérer. Le test ultime !
+
+1.  **Assurez-vous que votre application `webapp-helm` dans ArgoCD est bien configurée** pour pointer vers le chemin `webapp/webapp-chart` du dépôt `datascientest-chart` et que la synchronisation automatique est activée.
+
+2.  **Faites une modification visible dans le code de l'application.**
+    Ouvrez le fichier `app/static-website-example/index.html` et changez le titre `<h1>`.
+    Par exemple : `<h1>Mon App est maintenant automatisée !</h1>`
+
+3.  **Poussez le changement sur GitHub.**
+    ```bash
+    git add app/static-website-example/index.html
+    git commit -m "feat: Mise à jour du titre de la page d'accueil"
+    git push origin main
+    ```
+
+4.  **Observez le spectacle !**
+    *   **Étape 1 (GitHub Actions) :** Allez dans l'onglet "Actions" de votre dépôt `argocd-datascientest`. Vous verrez votre pipeline se déclencher. Suivez les étapes : build, scan, push, et surtout le dernier job `trigger-argocd-sync` qui va commiter dans l'autre dépôt.
+    *   **Étape 2 (Dépôt GitOps) :** Une fois le pipeline terminé, allez sur votre dépôt `datascientest-chart`. Vous verrez un nouveau commit fait par "GitHub Actions Bot" qui a modifié le tag de l'image dans `webapp/webapp-chart/values.yaml`.
+    *   **Étape 3 (ArgoCD) :** Allez sur votre interface ArgoCD. Cliquez sur le bouton `Refresh` de l'application `webapp-helm`. ArgoCD va détecter que l'état désiré dans Git a changé (le tag de l'image n'est plus le même). L'application va passer à l'état `OutOfSync`.
+    *   **Étape 4 (Déploiement) :** Puisque la politique de synchronisation est `Automatic`, ArgoCD va immédiatement commencer le déploiement. Il va créer un nouveau ReplicaSet, démarrer de nouveaux pods avec la nouvelle image, et une fois qu'ils sont prêts, il va supprimer les anciens. C'est un déploiement `RollingUpdate` sans interruption de service.
+
+5.  **Vérifiez le résultat.**
+    Une fois l'application `Synced` et `Healthy` dans ArgoCD, rafraîchissez la page de votre application web dans votre navigateur. Vous devriez voir le nouveau titre que vous avez modifié !
+
+Vous venez de mettre en place un workflow CI/CD GitOps complet, sécurisé et entièrement automatisé. C'est le standard de l'industrie et une compétence extrêmement recherchée.
 
 ## 6. Concepts Avancés
 
