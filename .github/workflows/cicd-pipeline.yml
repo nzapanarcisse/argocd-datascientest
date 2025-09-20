@@ -1,0 +1,95 @@
+name: CI/CD - Pipeline de Déploiement de l'Application Web
+
+on:
+  # Déclencher le workflow uniquement lors d'un push sur la branche main
+  # ET si les changements concernent le code de l'application.
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'app/**'
+
+jobs:
+  build-scan-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.generate_tag.outputs.tag }}
+
+    steps:
+      - name: 1. Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: 2. Génération d'un tag unique pour l'image
+        id: generate_tag
+        # Nous utilisons le hash du commit pour un tag unique et traçable.
+        run: echo "tag=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_OUTPUT
+
+      - name: 3. Configuration de Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 4. Connexion à Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: 5. Build de l'image Docker
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: . # Le contexte est la racine de notre projet
+          file: ./app/Dockerfile # Spécifier l'emplacement du Dockerfile
+          push: false # Ne pas pousser tout de suite, on scanne d'abord
+          tags: datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}
+          load: true # Charger l'image dans le runner pour le scan
+
+      - name: 6. Lancement des tests (Simulation)
+        run: |
+          echo "Lancement des tests unitaires et d'intégration..."
+          # Dans un vrai projet, vous auriez ici des commandes comme :
+          # npm test
+          # pytest
+          echo "Tests passés avec succès !"
+
+      - name: 7. Scan de vulnérabilités avec Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}'
+          format: 'table'
+          # Faire échouer le pipeline si des vulnérabilités HAUTES ou CRITIQUES sont trouvées
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: 8. Push de l'image sur Docker Hub (si le scan est réussi)
+        run: docker push datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}
+
+  # --- Job de Déploiement Continu (CD) ---
+  trigger-argocd-sync:
+    # Ce job ne démarre que si le précédent a réussi
+    needs: build-scan-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout du dépôt de Configuration (GitOps)
+        uses: actions/checkout@v4
+        with:
+          # C'est ici que la magie opère : on checkout le DEUXIÈME dépôt
+          repository: nzapanarcisse/datascientest-chart
+          # On a besoin d'un PAT pour pouvoir pousser les changements
+          token: ${{ secrets.GITOPS_PAT }}
+
+      - name: 2. Mise à jour du tag de l'image dans le chart Helm
+        run: |
+          # On utilise sed pour remplacer la valeur du tag dans le values.yaml
+          # C'est le "déclencheur" pour ArgoCD
+          sed -i "s/^  tag: .*/  tag: ${{needs.build-scan-and-push.outputs.image_tag}}/" webapp/webapp-chart/values.yaml
+
+      - name: 3. Commit et Push des changements vers le dépôt GitOps
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          git add webapp/webapp-chart/values.yaml
+          # On ne commit que s'il y a un réel changement
+          git diff --staged --quiet || git commit -m "CI: Mise à jour de l'image webapp vers le tag ${{needs.build-scan-and-push.outputs.image_tag}}"
+          git push
