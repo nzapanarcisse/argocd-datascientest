@@ -1,4 +1,4 @@
-<img width="1903" height="949" alt="image" src="https://github.com/user-attachments/assets/a0dcc3fd-5eb1-4e4d-87d4-01ddbd4e8dc8" /># Cours Complet ArgoCD : De la Théorie à la Production avec GitOps
+# Cours Complet ArgoCD : De la Théorie à la Production avec GitOps
 
 ![ArgoCD Logo](https://raw.githubusercontent.com/argoproj/argo-cd/master/docs/assets/argo.png)
 
