@@ -1,4 +1,4 @@
-# Cours Complet ArgoCD : De la Théorie à la Production avec GitOps
+<img width="1903" height="949" alt="image" src="https://github.com/user-attachments/assets/a0dcc3fd-5eb1-4e4d-87d4-01ddbd4e8dc8" /># Cours Complet ArgoCD : De la Théorie à la Production avec GitOps
 
 ![ArgoCD Logo](https://raw.githubusercontent.com/argoproj/argo-cd/master/docs/assets/argo.png)
 
@@ -404,7 +404,7 @@ Dans votre projet `argocd-datascientest`, créez le fichier `.github/workflows/c
 
 **2. Le Code du Workflow (`.github/workflows/cicd-pipeline.yml`)**
 
-Copiez le code suivant dans votre fichier. Chaque étape est commentée pour que vous, en tant que formateur, puissiez l'expliquer en détail.
+Copiez le code suivant dans votre fichier `.github/workflows/cicd-pipeline.yml`  ou forké le dépot pour avoir le projet sur votre propres repository.
 
 ```yaml
 name: CI/CD - Pipeline de Déploiement de l'Application Web
@@ -508,20 +508,24 @@ jobs:
 
 Ce pipeline a besoin de trois secrets pour fonctionner. Allez dans votre dépôt `argocd-datascientest`, puis dans `Settings > Secrets and variables > Actions` et ajoutez les secrets suivants :
 
-*   `DOCKER_USERNAME`: `datascientestuser`
-*   `DOCKER_PASSWORD`: `datascientestuser`
+*   `DOCKER_USERNAME`: `datascientestuser` ou username votre compte docker
+*   `DOCKER_PASSWORD`: `datascientestuser` ou password de votre compte docker
 *   `GITOPS_PAT`: Il s'agit d'un **Personal Access Token (PAT)** de GitHub. C'est crucial.
-    *   Allez dans les [paramètres de votre compte GitHub](https://github.com/settings/tokens) > `Personal access tokens` > `Tokens (classic)`.
+    *   Allez dans les [paramètres de votre compte GitHub](https://github.com/settings/tokens) (profile > setting > devoloper setting > `Personal access tokens` > `Tokens (classic)`.)
     *   Générez un nouveau token.
     *   Donnez-lui un nom (ex: `argocd-trigger`).
     *   **Cochez la case `repo`** pour lui donner les droits de lire et écrire dans vos dépôts.
     *   Copiez ce token et collez-le comme valeur pour le secret `GITOPS_PAT`.
 
+<img width="1899" height="692" alt="image" src="https://github.com/user-attachments/assets/295f34d1-49c5-47a5-b9eb-db85b513d93f" />
+
+<img width="1920" height="979" alt="image" src="https://github.com/user-attachments/assets/82943b16-f376-439f-84ea-56e292272cf9" />
+
 ### Démonstration du Workflow Automatisé
 
 Maintenant, il est temps de voir la magie opérer. Le test ultime !
 
-1.  **Assurez-vous que votre application `webapp-helm` dans ArgoCD est bien configurée** pour pointer vers le chemin `webapp/webapp-chart` du dépôt `datascientest-chart` et que la synchronisation automatique est activée.
+1.  **Assurez-vous que votre application `webapp` dans ArgoCD est bien configurée** pour pointer vers le chemin `webapp/webapp-chart` du dépôt `datascientest-chart` et que la synchronisation automatique est activée.
 
 2.  **Faites une modification visible dans le code de l'application.**
     Ouvrez le fichier `app/static-website-example/index.html` et changez le titre `<h1>`.
