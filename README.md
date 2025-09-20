@@ -265,17 +265,7 @@ Félicitations pour votre succès ! À ce stade, chaque fois qu'une modification
 
 Ouvrez votre navigateur et allez sur `[http://VOTRE_IP_PUBLIC:30089](https://54.234.45.177:30089)`(vérifiz que ce port est bien ouvert sur votre groupe de sécurité)
 
-![Uploading image.png…]()
-
-```bash
-# Ce mot de passe est stocké dans un secret Kubernetes
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-```
-<img width="1226" height="48" alt="image" src="https://github.com/user-attachments/assets/589a462b-5d3b-4c80-be01-1d70f4deea01" />
-
-Connectez-vous. Vous êtes sur le tableau de bord d'ArgoCD !
-
-<img width="1911" height="778" alt="image" src="https://github.com/user-attachments/assets/33bb4545-1e3e-4163-b3c7-8a9bf0d6fbf3" />
+<img width="1920" height="777" alt="image" src="https://github.com/user-attachments/assets/c558e8f7-c4d9-4126-a24c-ed3249d423da" />
 
 Récupérez le mot de passe d'Odoo à partir du secret Odoo créé par la stack en exécutant la commande suivante :
 ```bash
