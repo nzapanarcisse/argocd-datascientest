@@ -413,7 +413,7 @@ on:
   # Déclencher le workflow uniquement lors d'un push sur la branche main
   # ET si les changements concernent le code de l'application.
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
     paths:
       - 'app/**'
 
