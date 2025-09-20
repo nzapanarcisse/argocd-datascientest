@@ -297,7 +297,7 @@ Nous avons déjà créé une charte Helm pour cette application et l'avons plac�
 
 1.  **Cliquez sur `+ NEW APP`**.
 2.  **Informations Générales :**
-    *   **Application Name** : `webapp-helm`
+    *   **Application Name** : `webapp`
     *   **Project Name** : `default`
 3.  **Politique de Synchronisation :** `Automatic`, avec `Prune Resources` et `Self Heal`.
 4.  **Source :**
@@ -310,6 +310,19 @@ Nous avons déjà créé une charte Helm pour cette application et l'avons plac�
 6.  **Cliquez sur `CREATE`**.
 
 ArgoCD va maintenant déployer notre application web en utilisant la charte Helm que nous avons définie. Cela montre comment une entreprise peut gérer ses propres applications packagées de manière standardisée.
+
+<img width="1915" height="1007" alt="image" src="https://github.com/user-attachments/assets/2d4614a7-9a7b-40be-a736-09b50f3a8e9e" />
+
+<img width="1910" height="903" alt="image" src="https://github.com/user-attachments/assets/1b548df3-f19a-4215-9b84-8be7c3f2f545" />
+
+Vérification création de l'application sur le cluster :
+
+<img width="1900" height="270" alt="image" src="https://github.com/user-attachments/assets/483f1d6a-d988-4a5f-bf1b-5618d158bfbf" />
+
+Ouvrez le navigateur et allez sur `[http://VOTRE_IP_PUBLIC:30000](https://54.234.45.177:30000)`(vérifiz que ce port est bien ouvert sur votre groupe de sécurité)
+
+<img width="1908" height="954" alt="image" src="https://github.com/user-attachments/assets/49a8ec38-dada-49f8-81ad-c191aa51eef1" />
+
 
 ### Cas 3 : Déploiement d'une Application Web (Manifestes Kubernetes Bruts)
 
@@ -339,10 +352,25 @@ Nous avons pris les mêmes composants (un déploiement et un service) et les avo
     *   **Path** : `webapp/webapp-manifest` (le chemin vers nos fichiers YAML).
 5.  **Destination :**
     *   **Cluster URL** : `https://kubernetes.default.svc`
-    *   **Namespace** : `webapp-raw` (un namespace différent pour éviter les conflits).
+    *   **Namespace** : `webapp-manifest` (un namespace différent pour éviter les conflits).
 6.  **Cliquez sur `CREATE`**.
 
 ArgoCD va lire les fichiers `deployment.yaml` et `service.yaml` et les appliquer au cluster. Le résultat final est le même (l'application est déployée), mais nous avons utilisé une méthode différente. Cela prouve aux équipes qu'ArgoCD s'adapte à leurs compétences tout en garantissant une gestion centralisée et basée sur Git.
+
+<img width="1892" height="991" alt="image" src="https://github.com/user-attachments/assets/52b48e4f-2e6b-41f9-aaaa-860a6a3f231b" />
+
+
+<img width="1891" height="1032" alt="image" src="https://github.com/user-attachments/assets/792b843e-9fa2-490e-b791-0a238750e1ef" />
+
+Vérification création de l'application sur le cluster :
+
+<img width="1918" height="260" alt="image" src="https://github.com/user-attachments/assets/f5b85862-0c14-4e46-a2d7-94205abe8baa" />
+
+
+Ouvrez le navigateur et allez sur `[http://VOTRE_IP_PUBLIC:30001](https://54.234.45.177:30001)`(vérifiz que ce port est bien ouvert sur votre groupe de sécurité)
+
+<img width="1882" height="915" alt="image" src="https://github.com/user-attachments/assets/19a62dc2-1e08-4e0b-8d9f-14601191796d" />
+
 
 ## 5. Atelier 3 : Automatisation Complète avec un Pipeline CI/CD GitOps
 
