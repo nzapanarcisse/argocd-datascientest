@@ -483,7 +483,7 @@ jobs:
   # =======================================================================================
   # == Objectif : Démarrer le conteneur et vérifier qu'il répond correctement.         ==
   # =======================================================================================
-  test:
+  test-acceptance:
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -523,9 +523,9 @@ jobs:
   # =======================================================================================
   # == Objectif : Scanner l'image pour détecter des vulnérabilités de sécurité.         ==
   # =======================================================================================
-  scan:
+  test-qualite:
     runs-on: ubuntu-latest
-    needs: [build, test]
+    needs: [build, test-acceptance]
     steps:
       - name: 3.1. Récupération de l'image Docker
         uses: actions/download-artifact@v4
@@ -553,7 +553,7 @@ jobs:
   # =======================================================================================
   push:
     runs-on: ubuntu-latest
-    needs: [build, scan]
+    needs: [build, test-qualite]
     steps:
       - name: 4.1. Récupération de l'image Docker
         uses: actions/download-artifact@v4
