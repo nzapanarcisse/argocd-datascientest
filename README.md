@@ -425,7 +425,7 @@ name: CI/CD - Pipeline de Déploiement de l'Application Web
 # =========================================================================================
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
     paths:
       - 'app/**'
 
