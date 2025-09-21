@@ -407,101 +407,198 @@ Dans votre projet `argocd-datascientest`, créez le fichier `.github/workflows/c
 Copiez le code suivant dans votre fichier `.github/workflows/cicd-pipeline.yml`  ou forké le dépot pour avoir le projet sur votre propres repository.
 
 ```yaml
+# =========================================================================================
+# ==              PIPELINE DE CI/CD POUR L'APPLICATION WEB                             ==
+# =========================================================================================
+# == Ce workflow GitHub Actions est conçu pour automatiser le cycle de vie de          ==
+# == notre application web, de la construction à la synchronisation avec ArgoCD.       ==
+# =========================================================================================
+
 name: CI/CD - Pipeline de Déploiement de l'Application Web
 
+# =========================================================================================
+# ==                                     TRIGGERS                                        ==
+# =========================================================================================
+# == Le workflow se déclenche automatiquement dans les conditions suivantes :            ==
+# ==  - Un `push` est effectué sur la branche `main`.                                   ==
+# ==  - Les modifications concernent le répertoire `app/`, où se trouve le code source. ==
+# =========================================================================================
 on:
-  # Déclencher le workflow uniquement lors d'un push sur la branche main
-  # ET si les changements concernent le code de l'application.
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths:
       - 'app/**'
 
+# =========================================================================================
+# ==                                      JOBS                                         ==
+# =========================================================================================
+# == Le workflow est divisé en plusieurs jobs qui s'exécutent séquentiellement.        ==
+# == Chaque job est une étape logique de notre pipeline : Build > Test > Scan > Push.    ==
+# =========================================================================================
 jobs:
-  build-scan-and-push:
+  # =======================================================================================
+  # == JOB 1: BUILD - Construction de l'image Docker                                    ==
+  # =======================================================================================
+  # == Objectif : Construire l'image Docker de l'application et la stocker en tant      ==
+  # == qu'artefact pour les jobs suivants.                                               ==
+  # =======================================================================================
+  build:
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.generate_tag.outputs.tag }}
-
     steps:
-    - name: 1. Récupération du code source
-      uses: actions/checkout@v4
+      # --- Étape 1.1 : Récupération du code ---
+      - name: 1.1. Récupération du code source
+        uses: actions/checkout@v4
 
-    - name: 2. Génération d'un tag unique pour l'image
-      id: generate_tag
-      # Nous utilisons le hash du commit pour un tag unique et traçable.
-      run: echo "tag=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_OUTPUT
+      # --- Étape 1.2 : Génération d'un tag unique ---
+      - name: 1.2. Génération d'un tag unique pour l'image
+        id: generate_tag
+        run: echo "tag=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_OUTPUT
 
-    - name: 3. Configuration de Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      # --- Étape 1.3 : Configuration de Docker Buildx ---
+      - name: 1.3. Configuration de Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: 4. Connexion à Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      # --- Étape 1.4 : Build de l'image Docker ---
+      - name: 1.4. Build de l'image Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./app/Dockerfile
+          push: false
+          tags: datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}
+          load: true
 
-    - name: 5. Build de l'image Docker
-      id: docker_build
-      uses: docker/build-push-action@v5
-      with:
-        context: . # Le contexte est la racine de notre projet
-        file: ./app/Dockerfile # Spécifier l'emplacement du Dockerfile
-        push: false # Ne pas pousser tout de suite, on scanne d'abord
-        tags: datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}
-        load: true # Charger l'image dans le runner pour le scan
+      # --- Étape 1.5 : Sauvegarde de l'image en tant qu'artefact ---
+      - name: 1.5. Sauvegarde de l'image Docker pour les jobs suivants
+        run: docker save datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }} -o image.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: image.tar
 
-    - name: 6. Lancement des tests (Simulation)
-      run: |
-        echo "Lancement des tests unitaires et d'intégration..."
-        # Dans un vrai projet, vous auriez ici des commandes comme :
-        # npm test
-        # pytest
-        echo "Tests passés avec succès !"
-
-    - name: 7. Scan de vulnérabilités avec Trivy
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}'
-        format: 'table'
-        # Faire échouer le pipeline si des vulnérabilités HAUTES ou CRITIQUES sont trouvées
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
-
-    - name: 8. Push de l'image sur Docker Hub (si le scan est réussi)
-      run: docker push datascientestuser/webapp:${{ steps.generate_tag.outputs.tag }}
-
-  # --- Job de Déploiement Continu (CD) ---
-  trigger-argocd-sync:
-    # Ce job ne démarre que si le précédent a réussi
-    needs: build-scan-and-push
+  # =======================================================================================
+  # == JOB 2: TEST - Test de fumée (Smoke Test) de l'application                       ==
+  # =======================================================================================
+  # == Objectif : Démarrer le conteneur et vérifier qu'il répond correctement.         ==
+  # =======================================================================================
+  test:
     runs-on: ubuntu-latest
-
+    needs: build
     steps:
-    - name: 1. Checkout du dépôt de Configuration (GitOps)
-      uses: actions/checkout@v4
-      with:
-        # C'est ici que la magie opère : on checkout le DEUXIÈME dépôt
-        repository: nzapanarcisse/datascientest-chart
-        # On a besoin d'un PAT pour pouvoir pousser les changements
-        token: ${{ secrets.GITOPS_PAT }}
+      # --- Étape 2.1 : Récupération de l'artefact de l'image ---
+      - name: 2.1. Récupération de l'image Docker
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
 
-    - name: 2. Mise à jour du tag de l'image dans le chart Helm
-      run: |
-        # On utilise sed pour remplacer la valeur du tag dans le values.yaml
-        # C'est le "déclencheur" pour ArgoCD
-        sed -i "s/^  tag: .*/  tag: ${{needs.build-scan-and-push.outputs.image_tag}}/" webapp/webapp-chart/values.yaml
+      # --- Étape 2.2 : Chargement de l'image ---
+      - name: 2.2. Chargement de l'image Docker
+        run: docker load -i image.tar
 
-    - name: 3. Commit et Push des changements vers le dépôt GitOps
-      run: |
-        git config --global user.name 'GitHub Actions Bot'
-        git config --global user.email 'actions@github.com'
-        git add webapp/webapp-chart/values.yaml
-        # On ne commit que s'il y a un réel changement
-        git diff --staged --quiet || git commit -m "CI: Mise à jour de l'image webapp vers le tag ${{needs.build-scan-and-push.outputs.image_tag}}"
-        git push
+      # --- Étape 2.3 : Lancement du conteneur ---
+      - name: 2.3. Lancement du conteneur pour le test
+        run: |
+          docker run -d -p 8080:80 --name webapp-test datascientestuser/webapp:${{ needs.build.outputs.image_tag }}
+          echo "IMAGE_TAG=${{ needs.build.outputs.image_tag }}" >> $GITHUB_ENV
+
+      # --- Étape 2.4 : Test de l'application ---
+      - name: 2.4. Test de la réponse de l'application
+        run: |
+          echo "Attente du démarrage de l'application..."
+          sleep 10
+          echo "Vérification du contenu de la page d'accueil..."
+          curl -s http://localhost:8080 | grep "Dimension"
+
+      # --- Étape 2.5 : Nettoyage ---
+      - name: 2.5. Arrêt et suppression du conteneur de test
+        if: always() # S'exécute toujours, même si l'étape de test a échoué
+        run: |
+          docker stop webapp-test
+          docker rm webapp-test
+
+  # =======================================================================================
+  # == JOB 3: SCAN - Analyse de vulnérabilités de l'image                               ==
+  # =======================================================================================
+  # == Objectif : Scanner l'image pour détecter des vulnérabilités de sécurité.         ==
+  # =======================================================================================
+  scan:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: 3.1. Récupération de l'image Docker
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+      - name: 3.2. Chargement de l'image Docker
+        run: |
+          docker load -i image.tar
+          echo "IMAGE_TAG=${{ needs.build.outputs.image_tag }}" >> $GITHUB_ENV
+
+      - name: 3.3. Scan de vulnérabilités avec Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'datascientestuser/webapp:${{ env.IMAGE_TAG }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+  # =======================================================================================
+  # == JOB 4: PUSH - Publication de l'image Docker                                      ==
+  # =======================================================================================
+  # == Objectif : Pousser l'image, si elle est sûre, vers le registre Docker Hub.       ==
+  # =======================================================================================
+  push:
+    runs-on: ubuntu-latest
+    needs: scan
+    steps:
+      - name: 4.1. Récupération de l'image Docker
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+      - name: 4.2. Chargement de l'image Docker
+        run: |
+          docker load -i image.tar
+          echo "IMAGE_TAG=${{ needs.build.outputs.image_tag }}" >> $GITHUB_ENV
+
+      - name: 4.3. Connexion à Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: 4.4. Push de l'image sur Docker Hub
+        run: docker push datascientestuser/webapp:${{ env.IMAGE_TAG }}
+
+  # =======================================================================================
+  # == JOB 5: DEPLOY - Déclenchement de la synchronisation ArgoCD                        ==
+  # =======================================================================================
+  # == Objectif : Mettre à jour le dépôt GitOps pour qu'ArgoCD déploie la nouvelle image. ==
+  # =======================================================================================
+  trigger-argocd-sync:
+    runs-on: ubuntu-latest
+    needs: push
+    steps:
+      - name: 5.1. Checkout du dépôt de Configuration (GitOps)
+        uses: actions/checkout@v4
+        with:
+          repository: nzapanarcisse/datascientest-chart
+          token: ${{ secrets.GITOPS_PAT }}
+
+      - name: 5.2. Mise à jour du tag de l'image dans le chart Helm
+        run: |
+          sed -i "s/^  tag: .*/  tag: ${{needs.build.outputs.image_tag}}/" webapp/webapp-chart/values.yaml
+
+      - name: 5.3. Commit et Push des changements vers le dépôt GitOps
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          git add webapp/webapp-chart/values.yaml
+          git diff --staged --quiet || git commit -m "CI: Mise à jour de l'image webapp vers le tag ${{needs.build.outputs.image_tag}}"
+          git push
 ```
 
 **3. Configuration des Secrets**
