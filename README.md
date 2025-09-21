@@ -636,13 +636,21 @@ Maintenant, il est temps de voir la magie opérer. Le test ultime !
     ```
 
 4.  **Observez le spectacle !**
-    *   **Étape 1 (GitHub Actions) :** Allez dans l'onglet "Actions" de votre dépôt `argocd-datascientest`. Vous verrez votre pipeline se déclencher. Suivez les étapes : build, scan, push, et surtout le dernier job `trigger-argocd-sync` qui va commiter dans l'autre dépôt.
+    *   **Étape 1 (GitHub Actions) :** Allez dans l'onglet "Actions" de votre dépôt `argocd-datascientest`. Vous verrez votre pipeline se déclencher. Suivez les étapes : build, test-acceptance,test-qualité, push, et surtout le dernier job `trigger-argocd-sync` qui va commiter dans l'autre dépôt.
+
+      <img width="1928" height="701" alt="image" src="https://github.com/user-attachments/assets/850f546d-25dc-4508-b737-da3eeb135abf" />
+
     *   **Étape 2 (Dépôt GitOps) :** Une fois le pipeline terminé, allez sur votre dépôt `datascientest-chart`. Vous verrez un nouveau commit fait par "GitHub Actions Bot" qui a modifié le tag de l'image dans `webapp/webapp-chart/values.yaml`.
+      
+      <img width="1877" height="578" alt="image" src="https://github.com/user-attachments/assets/817e163d-b6fc-47ca-851a-10d3f4c9ac29" />
+
     *   **Étape 3 (ArgoCD) :** Allez sur votre interface ArgoCD. Cliquez sur le bouton `Refresh` de l'application `webapp-helm`. ArgoCD va détecter que l'état désiré dans Git a changé (le tag de l'image n'est plus le même). L'application va passer à l'état `OutOfSync`.
     *   **Étape 4 (Déploiement) :** Puisque la politique de synchronisation est `Automatic`, ArgoCD va immédiatement commencer le déploiement. Il va créer un nouveau ReplicaSet, démarrer de nouveaux pods avec la nouvelle image, et une fois qu'ils sont prêts, il va supprimer les anciens. C'est un déploiement `RollingUpdate` sans interruption de service.
 
 5.  **Vérifiez le résultat.**
     Une fois l'application `Synced` et `Healthy` dans ArgoCD, rafraîchissez la page de votre application web dans votre navigateur. Vous devriez voir le nouveau titre que vous avez modifié !
+
+   <img width="1875" height="967" alt="image" src="https://github.com/user-attachments/assets/86dd3e47-fa7d-4577-a1ec-8707d1d42aa7" />
 
 Vous venez de mettre en place un workflow CI/CD GitOps complet, sécurisé et entièrement automatisé. C'est le standard de l'industrie et une compétence extrêmement recherchée.
 
