@@ -134,6 +134,7 @@ helm repo update
 helm version
 # Vous devriez voir la version de votre helm installé.
 ```
+
 <img width="1215" height="50" alt="image" src="https://github.com/user-attachments/assets/81ce7b42-b4f1-4a84-a2f9-7c296a18f3c9" />
 
 ### Installation d'ArgoCD avec Helm
@@ -174,6 +175,7 @@ Le nom d'utilisateur est `admin`. Pour obtenir le mot de passe initial :
 # Ce mot de passe est stocké dans un secret Kubernetes
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
+
 <img width="1226" height="48" alt="image" src="https://github.com/user-attachments/assets/589a462b-5d3b-4c80-be01-1d70f4deea01" />
 
 Connectez-vous. Vous êtes sur le tableau de bord d'ArgoCD !
@@ -247,6 +249,7 @@ ArgoCD va d'abord cloner le dépôt Git, puis comparer l'état de la charte Helm
 Observez l'application passer par les états `Progressing` puis `Healthy` et `Synced`. Vous pouvez cliquer sur l'application pour explorer toutes les ressources Kubernetes (Deployments, Services, PersistentVolumeClaims, etc.) qui ont été créées, le tout sans une seule ligne de `kubectl` !
 
 <img width="1299" height="508" alt="image" src="https://github.com/user-attachments/assets/fb66e28f-ccff-473a-830c-4d0ed67ea85f" />
+
 
 En cliquant sur votre application Odoo depuis le tableau de bord Argo, vous pouvez voir les ressources en cours de création sur votre cluster.
 
