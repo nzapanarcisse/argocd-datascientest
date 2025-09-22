@@ -45,7 +45,7 @@ Kubernetes orchestre les tâches de déploiement et de gestion des conteneurs. I
 
 Kubernetes est idéalement utilisé dans le cadre d'un workflow de livraison continue. L'exécution de déploiements automatisés lors de la fusion de nouveau code garantit que les modifications parviennent rapidement à votre cluster après avoir transité par un pipeline cohérent.
 
-Dans cet article, nous allons explorer les fonctionnalités d'Argo CD et l'utiliser pour exécuter une application de démonstration simple.
+Nous allons explorer les fonctionnalités d'Argo CD et l'utiliser pour exécuter une application de démonstration simple.
 
 Ce que nous allons couvrir :
 
