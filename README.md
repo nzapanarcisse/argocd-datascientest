@@ -13,27 +13,27 @@ Cette formation s’adresse principalement aux ingénieurs DevOps, administrateu
 
 À l’issue de cette formation, les participants seront capables de :
 
-Comprendre les concepts de GitOps et d’ArgoCD : Acquérir une connaissance approfondie de l’architecture d’ArgoCD et de son rôle dans une approche GitOps.
+- Comprendre les concepts de GitOps et d’ArgoCD : Acquérir une connaissance approfondie de l’architecture d’ArgoCD et de son rôle dans une approche GitOps.
 
-Installer et configurer ArgoCD : Déployer ArgoCD dans un cluster Kubernetes et configurer ses composants essentiels.
+- Installer et configurer ArgoCD : Déployer ArgoCD dans un cluster Kubernetes et configurer ses composants essentiels.
 
-Gérer les applications avec ArgoCD : Déclarer, synchroniser et superviser des applications Kubernetes à partir d’un dépôt Git.
+- Gérer les applications avec ArgoCD : Déclarer, synchroniser et superviser des applications Kubernetes à partir d’un dépôt Git.
 
-Automatiser les déploiements : Mettre en place la synchronisation automatique et appliquer les bonnes pratiques GitOps.
+- Automatiser les déploiements : Mettre en place la synchronisation automatique et appliquer les bonnes pratiques GitOps.
 
-Intégrer un pipeline CI/CD : Construire un pipeline complet avec GitHub Actions pour automatiser la construction d’images, la mise à jour des manifests et le déploiement via ArgoCD.
+- Intégrer un pipeline CI/CD : Construire un pipeline complet avec GitHub Actions pour automatiser la construction d’images, la mise à jour des manifests et le déploiement via ArgoCD.
 
-Sécuriser et organiser ses déploiements : Gérer les accès, secrets et environnements multiples (dev, staging, prod).
+- Sécuriser et organiser ses déploiements : Gérer les accès, secrets et environnements multiples (dev, staging, prod).
 
 # Prérequis
 
 Les participants doivent avoir :
 
-Des connaissances de base en Kubernetes (pods, services, deployments).
+- Des connaissances de base en Kubernetes (pods, services, deployments).
 
-Des notions en administration système et réseaux.
+- Des notions en administration système et réseaux.
 
-Une compréhension générale du développement logiciel et des workflows CI/CD.
+- Une compréhension générale du développement logiciel et des workflows CI/CD.
 
 ## Table des Matières
 
