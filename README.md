@@ -51,13 +51,14 @@ Argo CD surveille en permanence les dépôts Git et compare l'état réel du clu
 
 Les principales caractéristiques d'Argo CD incluent :
 
-Déploiement basé sur GitOps – Utilise Git comme source unique de vérité, permettant une configuration déclarative et une synchronisation automatisée avec les clusters Kubernetes
-Définitions d'application déclaratives – Prend en charge Helm, Kustomize, Jsonnet et YAML simple pour définir et gérer les manifestes d'application
-Synchronisation automatisée – Synchronise automatiquement les ressources Kubernetes avec les référentiels Git, garantissant que l'état du cluster correspond à l'état souhaité
-Surveillance de l'état des applications en temps réel – Surveille en permanence l'état de santé et de synchronisation des applications, avec des tableaux de bord visuels et des vues différentielles
-Contrôle d'accès basé sur les rôles (RBAC) – Contrôles d'accès précis pour la gestion des autorisations des utilisateurs dans les projets et les environnements
-Prise en charge multi-cluster – Gère les déploiements sur plusieurs clusters Kubernetes à partir d'une seule instance Argo CD
-Interface utilisateur Web et CLI – Fournit une interface Web et une CLI conviviales pour la gestion des applications, l'affichage des différences et le dépannage
+- Déploiement basé sur GitOps – Utilise Git comme source unique de vérité, permettant une configuration déclarative et une synchronisation automatisée avec les clusters Kubernetes.
+- Définitions d'application déclaratives – Prend en charge Helm, Kustomize, Jsonnet et YAML simple pour définir et gérer les manifestes d'application
+Synchronisation automatisée – Synchronise automatiquement les ressources Kubernetes avec les référentiels Git, garantissant que l'état du cluster correspond à l'état souhaité.
+- Surveillance de l'état des applications en temps réel – Surveille en permanence l'état de santé et de synchronisation des applications, avec des tableaux de bord visuels et des vues différentielles.
+- Contrôle d'accès basé sur les rôles (RBAC) – Contrôles d'accès précis pour la gestion des autorisations des utilisateurs dans les projets et les environnements.
+- Prise en charge multi-cluster – Gère les déploiements sur plusieurs clusters Kubernetes à partir d'une seule instance Argo CD.
+- Interface utilisateur Web et CLI – Fournit une interface Web et une CLI conviviales pour la gestion des applications, l'affichage des différences et le dépannage.
+  
 Officiellement publié en mai 2019 par Intuit dans le cadre du projet Argo, Argo CD 1.0 a été conçu pour permettre une livraison continue de type GitOps sur Kubernetes. Depuis, il est devenu un composant essentiel des workflows de déploiement Kubernetes modernes et fait désormais partie de l'écosystème CNCF (Cloud Native Computing Foundation).
 
 Concepts de base d'Argo CD
