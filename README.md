@@ -36,17 +36,17 @@ Les participants doivent disposer des prérequis suivants :
 - Une compréhension générale du développement logiciel ainsi que des workflows CI/CD.
 
 ## 1. Introduction : Pourquoi ArgoCD dans une démarche DevOps ?
-Argo CD est décrit comme un outil déclaratif de livraison continue GitOps pour Kubernetes. Il peut surveiller vos dépôts sources et déployer automatiquement les modifications sur votre cluster.
+Argo CD est un outil déclaratif de livraison continue basé sur GitOps pour Kubernetes. Il surveille vos dépôts sources et déploie automatiquement les modifications sur votre cluster.
 
-Kubernetes orchestre les tâches de déploiement et de gestion des conteneurs. Il démarre vos conteneurs, les remplace en cas de panne et adapte votre service aux nœuds de calcul de votre cluster.
+Kubernetes orchestre les tâches de déploiement et de gestion des conteneurs. Il démarre les conteneurs, les remplace en cas de panne, et ajuste les services en fonction des nœuds de calcul du cluster.
 
-Kubernetes est idéalement utilisé dans le cadre d'un workflow de livraison continue. L'exécution de déploiements automatisés lors de la fusion de nouveau code garantit que les modifications parviennent rapidement à votre cluster après avoir transité par un pipeline cohérent.
+Kubernetes est idéalement utilisé dans un workflow de livraison continue. L’exécution de déploiements automatisés lors de la fusion de nouveau code garantit que les modifications atteignent rapidement le cluster via un pipeline cohérent.
 
-Argo CD est un outil open source de livraison continue déclarative pour Kubernetes, basé sur GitOps. Il permet le déploiement automatisé d'applications en synchronisant l'état souhaité d'un dépôt Git vers un cluster Kubernetes.
+Cet outil open source permet le déploiement automatisé d’applications en synchronisant l’état souhaité défini dans un dépôt Git avec un cluster Kubernetes.
 
-Argo CD surveille en permanence les dépôts Git et compare l'état réel du cluster à la configuration déclarée. En cas de différence, il peut alerter les utilisateurs ou appliquer automatiquement les modifications pour amener le système à l'état souhaité.
+Il surveille en permanence les dépôts Git et compare l’état réel du cluster à la configuration déclarée. En cas de divergence, Argo CD peut alerter les utilisateurs ou appliquer automatiquement les modifications pour aligner le cluster sur l’état souhaité.
 
-Les principales caractéristiques d'Argo CD incluent :
+Ses principales caractéristiques incluent :
 
 - Déploiement basé sur GitOps – Utilise Git comme source unique de vérité, permettant une configuration déclarative et une synchronisation automatisée avec les clusters Kubernetes.
 - Définitions d'application déclaratives – Prend en charge Helm, Kustomize, Jsonnet et YAML simple pour définir et gérer les manifestes d'application
