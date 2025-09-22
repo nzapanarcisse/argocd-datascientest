@@ -17,8 +17,8 @@ name: CI/CD - Pipeline de Déploiement de l'Application Web
 on:
   push:
     branches: [ "master" ]
-    #paths:
-    #  - 'app/**'
+    paths:
+      - 'app/**'
 
 # =========================================================================================
 # ==                                      JOBS                                         ==
