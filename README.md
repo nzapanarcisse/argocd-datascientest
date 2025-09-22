@@ -2,7 +2,42 @@
 
 ![ArgoCD Logo](https://raw.githubusercontent.com/argoproj/argo-cd/master/docs/assets/argo.png)
 
-Bienvenue dans ce cours complet sur ArgoCD. En tant que professionnels du DevOps, nous savons que l'automatisation, la fiabilité et la cohérence sont les piliers de nos déploiements. Ce cours est conçu comme un atelier pratique pour vous faire découvrir la puissance du GitOps avec ArgoCD, un outil qui révolutionne la livraison continue sur Kubernetes.
+🎯 Présentation du cours : ArgoCD en pratique
+
+Bienvenue dans ce cours pratique sur ArgoCD !
+
+En tant que professionnels du DevOps, nous savons que la réussite de nos déploiements repose sur trois piliers : automatisation, fiabilité et cohérence.
+Ce programme a été pensé comme un atelier concret et immersif, pour vous initier à l’approche GitOps et découvrir comment ArgoCD transforme la livraison continue sur Kubernetes.
+
+🚀 Pourquoi suivre ce cours ?
+
+- Comprendre et appliquer le paradigme GitOps au sein de vos projets.
+
+- Déployer et gérer vos applications Kubernetes avec simplicité et efficacité.
+
+- Mettre en place une chaîne CI/CD moderne grâce à ArgoCD et GitHub Actions.
+
+- Gagner en autonomie sur la gestion de vos environnements (dev, staging, production).
+
+🎓 Objectifs pédagogiques
+
+- À l’issue de ce cours, vous serez capable de :
+
+- Installer et configurer ArgoCD dans un cluster Kubernetes.
+
+- Déclarer et synchroniser vos applications à partir de dépôts Git.
+
+- Automatiser vos déploiements en appliquant les bonnes pratiques GitOps.
+
+- Construire un pipeline CI/CD complet avec GitHub Actions et ArgoCD.
+
+👥 Public cible
+
+- Administrateurs systèmes et ingénieurs DevOps.
+
+- Développeurs souhaitant industrialiser leurs déploiements Kubernetes.
+
+- Toute personne désirant maîtriser l’approche GitOps dans un contexte professionnel.
 
 ## Table des Matières
 
