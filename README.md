@@ -35,44 +35,59 @@ Les participants doivent avoir :
 
 - Une compréhension générale du développement logiciel et des workflows CI/CD.
 
-## Table des Matières
-
-1.  [**Introduction : Pourquoi ArgoCD dans une démarche DevOps ?**](#1--introduction--pourquoi-argocd-dans-une-démarche-devops-)
-    *   Les limites du CI/CD traditionnel (Push)
-    *   Le GitOps comme "Single Source of Truth" (Pull)
-    *   Les bénéfices d'ArgoCD
-2.  [**Architecture et Fonctionnement**](#2--architecture-et-fonctionnement)
-    *   Les 3 composants clés d'ArgoCD
-    *   Le cycle de réconciliation
-3.  [**Atelier 1 : Installation de l'Environnement de Travail**](#3--atelier-1--installation-de-lenvironnement-de-travail)
-    *   Prérequis
-    *   Installation de K3s sur Amazon Linux
-    *   Installation d'ArgoCD avec Helm
-    *   Accès à l'interface ArgoCD
-4.  [**Atelier 2 : Déploiement d'Applications avec ArgoCD**](#4--atelier-2--déploiement-dapplications-avec-argocd)
-    *   **Cas 1 : Déploiement d'Odoo 18 via l'UI (Chart Helm Existant)**
-    *   **Cas 2 : Préparation de notre application "Site Vitrine"**
-        *   Création du code source et des manifestes Kubernetes
-        *   Création du dépôt GitHub
-    *   **Cas 3 : Déploiement du "Site Vitrine" via l'UI (Dépôt Git Privé)**
-5.  [**Atelier 3 : Workflow CI/CD Complet avec GitHub Actions**](#5--atelier-3--workflow-cicd-complet-avec-github-actions)
-    *   Le concept : Git est la seule source de vérité
-    *   Mise en place du pipeline GitHub Actions
-    *   Démonstration du workflow automatisé
-6.  [**Concepts Avancés**](#6--concepts-avancés)
-    *   **ArgoCD et le Multi-Cluster**
-        *   Enregistrer un second cluster
-        *   Déployer sur un cluster distant
-    *   **Notifications avec Slack**
-        *   Configuration du webhook Slack
-        *   Mise à jour de notre application pour les notifications
-7.  [**Conclusion**](#7--conclusion)
-8.  [**Examen de Validation : Déployez votre Propre Application**](#8--examen-de-validation--déployez-votre-propre-application)
-
 
 ---
 
 ## 1. Introduction : Pourquoi ArgoCD dans une démarche DevOps ?
+Argo CD est décrit comme un outil déclaratif de livraison continue GitOps pour Kubernetes. Il peut surveiller vos dépôts sources et déployer automatiquement les modifications sur votre cluster.
+
+Kubernetes orchestre les tâches de déploiement et de gestion des conteneurs. Il démarre vos conteneurs, les remplace en cas de panne et adapte votre service aux nœuds de calcul de votre cluster.
+
+Kubernetes est idéalement utilisé dans le cadre d'un workflow de livraison continue. L'exécution de déploiements automatisés lors de la fusion de nouveau code garantit que les modifications parviennent rapidement à votre cluster après avoir transité par un pipeline cohérent.
+
+Dans cet article, nous allons explorer les fonctionnalités d'Argo CD et l'utiliser pour exécuter une application de démonstration simple.
+
+Ce que nous allons couvrir :
+
+Qu'est-ce qu'Argo CD ?
+Concepts de base d'Argo CD
+Comment fonctionne Argo CD ?
+Exemple pratique : Utilisation d'Argo CD pour déployer sur Kubernetes
+Bonnes pratiques d'utilisation d'Argo CD
+Alternatives au CD Argo
+Qu'est-ce qu'Argo CD ?
+Argo CD est un outil open source de livraison continue déclarative pour Kubernetes, basé sur GitOps. Il permet le déploiement automatisé d'applications en synchronisant l'état souhaité d'un dépôt Git vers un cluster Kubernetes.
+
+Argo CD surveille en permanence les dépôts Git et compare l'état réel du cluster à la configuration déclarée. En cas de différence, il peut alerter les utilisateurs ou appliquer automatiquement les modifications pour amener le système à l'état souhaité.
+
+Les principales caractéristiques d'Argo CD incluent :
+
+Déploiement basé sur GitOps – Utilise Git comme source unique de vérité, permettant une configuration déclarative et une synchronisation automatisée avec les clusters Kubernetes
+Définitions d'application déclaratives – Prend en charge Helm, Kustomize, Jsonnet et YAML simple pour définir et gérer les manifestes d'application
+Synchronisation automatisée – Synchronise automatiquement les ressources Kubernetes avec les référentiels Git, garantissant que l'état du cluster correspond à l'état souhaité
+Surveillance de l'état des applications en temps réel – Surveille en permanence l'état de santé et de synchronisation des applications, avec des tableaux de bord visuels et des vues différentielles
+Contrôle d'accès basé sur les rôles (RBAC) – Contrôles d'accès précis pour la gestion des autorisations des utilisateurs dans les projets et les environnements
+Prise en charge multi-cluster – Gère les déploiements sur plusieurs clusters Kubernetes à partir d'une seule instance Argo CD
+Interface utilisateur Web et CLI – Fournit une interface Web et une CLI conviviales pour la gestion des applications, l'affichage des différences et le dépannage
+Officiellement publié en mai 2019 par Intuit dans le cadre du projet Argo, Argo CD 1.0 a été conçu pour permettre une livraison continue de type GitOps sur Kubernetes. Depuis, il est devenu un composant essentiel des workflows de déploiement Kubernetes modernes et fait désormais partie de l'écosystème CNCF (Cloud Native Computing Foundation).
+
+Concepts de base d'Argo CD
+Argo CD est facile à prendre en main une fois ses concepts de base compris. Voici les éléments clés de l'architecture Argo CD :
+
+Contrôleur d'application – Le contrôleur d'application d'Argo est le composant que vous installez dans votre cluster. Il implémente le modèle de contrôleur Kubernetes pour surveiller vos applications et comparer leur état à celui de leurs dépôts.
+Application – Une application Argo est un groupe de ressources Kubernetes qui déploient collectivement votre charge de travail. Argo stocke les détails des applications de votre cluster sous forme d'instances d'une définition de ressource personnalisée (CRD) incluse .
+État en direct – L'état en direct est l'état actuel de votre application à l'intérieur du cluster, tel que le nombre de pods créés et l'image qu'ils exécutent.
+État cible – L'état cible est la version de l'état déclaré par votre dépôt Git. Lorsque le dépôt change, Argo applique des actions qui font évoluer l'état actif vers l'état cible.
+Actualisation – Une actualisation se produit lorsqu'Argo récupère l'état cible de votre dépôt. Il compare les modifications à l'état actuel, mais ne les applique pas nécessairement à ce stade.
+Synchronisation – Une synchronisation consiste à appliquer les modifications détectées lors d'une actualisation. Chaque synchronisation ramène le cluster à son état cible.
+Serveur API – Le serveur API Argo fournit l’interface API REST et gRPC utilisée par la CLI, l’interface utilisateur Web et les intégrations externes.
+Référentiel Git – Le référentiel Git agit comme la source unique de vérité, stockant les configurations déclaratives pour toutes les applications et tous les environnements.
+Maintenant que nous avons abordé les concepts fondamentaux, nous pouvons déployer un exemple d'application sur Kubernetes avec Argo. La documentation officielle explique la terminologie et l'architecture d'Argo .
+
+Comment fonctionne Argo CD ?
+Argo CD est principalement utilisé par les ingénieurs DevOps, les équipes de plateforme et les administrateurs Kubernetes qui doivent gérer les déploiements d'applications dans un flux de travail piloté par GitOps.
+
+Le modèle GitOps est essentiel à la conception d'Argo CD. Il fait du dépôt la source unique de l'état souhaité de votre application. Votre dépôt doit contenir tous les manifestes Kubernetes, les modèles Kustomize, les charts Helm et les fichiers de configuration nécessaires à votre application. Ces ressources définissent les conditions d'un déploiement réussi de votre application.
 
 Dans un pipeline CI/CD "classique", c'est souvent le serveur de CI (Jenkins, GitLab CI, GitHub Actions) qui, après avoir construit une image, la "pousse" vers Kubernetes à l'aide de `kubectl apply` ou `helm upgrade`.
 
