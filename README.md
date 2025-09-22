@@ -2,42 +2,38 @@
 
 ![ArgoCD Logo](https://raw.githubusercontent.com/argoproj/argo-cd/master/docs/assets/argo.png)
 
-🎯 Présentation du cours : ArgoCD en pratique
+Objectif Pédagogique
 
-Bienvenue dans ce cours pratique sur ArgoCD !
+Cette formation sur ArgoCD a pour objectif de fournir aux participants les compétences nécessaires pour mettre en place une approche GitOps afin d’automatiser et fiabiliser le déploiement d’applications sur Kubernetes.
+Vous apprendrez à utiliser ArgoCD pour synchroniser vos environnements avec vos dépôts Git, gérer vos applications et intégrer un pipeline CI/CD avec GitHub Actions.
 
-En tant que professionnels du DevOps, nous savons que la réussite de nos déploiements repose sur trois piliers : automatisation, fiabilité et cohérence.
-Ce programme a été pensé comme un atelier concret et immersif, pour vous initier à l’approche GitOps et découvrir comment ArgoCD transforme la livraison continue sur Kubernetes.
+Cette formation s’adresse principalement aux ingénieurs DevOps, administrateurs systèmes et développeurs souhaitant améliorer leur efficacité dans la gestion et l’automatisation des déploiements Kubernetes.
 
-🚀 Pourquoi suivre ce cours ?
+Compétences Acquises
 
-- Comprendre et appliquer le paradigme GitOps au sein de vos projets.
+À l’issue de cette formation, les participants seront capables de :
 
-- Déployer et gérer vos applications Kubernetes avec simplicité et efficacité.
+Comprendre les concepts de GitOps et d’ArgoCD : Acquérir une connaissance approfondie de l’architecture d’ArgoCD et de son rôle dans une approche GitOps.
 
-- Mettre en place une chaîne CI/CD moderne grâce à ArgoCD et GitHub Actions.
+Installer et configurer ArgoCD : Déployer ArgoCD dans un cluster Kubernetes et configurer ses composants essentiels.
 
-- Gagner en autonomie sur la gestion de vos environnements (dev, staging, production).
+Gérer les applications avec ArgoCD : Déclarer, synchroniser et superviser des applications Kubernetes à partir d’un dépôt Git.
 
-🎓 Objectifs pédagogiques
+Automatiser les déploiements : Mettre en place la synchronisation automatique et appliquer les bonnes pratiques GitOps.
 
-- À l’issue de ce cours, vous serez capable de :
+Intégrer un pipeline CI/CD : Construire un pipeline complet avec GitHub Actions pour automatiser la construction d’images, la mise à jour des manifests et le déploiement via ArgoCD.
 
-- Installer et configurer ArgoCD dans un cluster Kubernetes.
+Sécuriser et organiser ses déploiements : Gérer les accès, secrets et environnements multiples (dev, staging, prod).
 
-- Déclarer et synchroniser vos applications à partir de dépôts Git.
+Prérequis
 
-- Automatiser vos déploiements en appliquant les bonnes pratiques GitOps.
+Les participants doivent avoir :
 
-- Construire un pipeline CI/CD complet avec GitHub Actions et ArgoCD.
+Des connaissances de base en Kubernetes (pods, services, deployments).
 
-👥 Public cible
+Des notions en administration système et réseaux.
 
-- Administrateurs systèmes et ingénieurs DevOps.
-
-- Développeurs souhaitant industrialiser leurs déploiements Kubernetes.
-
-- Toute personne désirant maîtriser l’approche GitOps dans un contexte professionnel.
+Une compréhension générale du développement logiciel et des workflows CI/CD.
 
 ## Table des Matières
 
