@@ -64,14 +64,15 @@ Officiellement publié en mai 2019 par Intuit dans le cadre du projet Argo, Argo
 Concepts de base d'Argo CD
 Argo CD est facile à prendre en main une fois ses concepts de base compris. Voici les éléments clés de l'architecture Argo CD :
 
-Contrôleur d'application – Le contrôleur d'application d'Argo est le composant que vous installez dans votre cluster. Il implémente le modèle de contrôleur Kubernetes pour surveiller vos applications et comparer leur état à celui de leurs dépôts.
-Application – Une application Argo est un groupe de ressources Kubernetes qui déploient collectivement votre charge de travail. Argo stocke les détails des applications de votre cluster sous forme d'instances d'une définition de ressource personnalisée (CRD) incluse .
-État en direct – L'état en direct est l'état actuel de votre application à l'intérieur du cluster, tel que le nombre de pods créés et l'image qu'ils exécutent.
+- Contrôleur d'application : Le contrôleur d'application d'Argo est le composant que vous installez dans votre cluster. Il implémente le modèle de contrôleur Kubernetes pour surveiller vos applications et comparer leur état à celui de leurs dépôts.
+- Application : Une application Argo est un groupe de ressources Kubernetes qui déploient collectivement votre charge de travail. Argo stocke les détails des applications de votre cluster sous forme d'instances d'une définition de ressource personnalisée (CRD) incluse .
+- État en direct : L'état en direct est l'état actuel de votre application à l'intérieur du cluster, tel que le nombre de pods créés et l'image qu'ils exécutent.
 État cible – L'état cible est la version de l'état déclaré par votre dépôt Git. Lorsque le dépôt change, Argo applique des actions qui font évoluer l'état actif vers l'état cible.
-Actualisation – Une actualisation se produit lorsqu'Argo récupère l'état cible de votre dépôt. Il compare les modifications à l'état actuel, mais ne les applique pas nécessairement à ce stade.
-Synchronisation – Une synchronisation consiste à appliquer les modifications détectées lors d'une actualisation. Chaque synchronisation ramène le cluster à son état cible.
-Serveur API – Le serveur API Argo fournit l’interface API REST et gRPC utilisée par la CLI, l’interface utilisateur Web et les intégrations externes.
-Référentiel Git – Le référentiel Git agit comme la source unique de vérité, stockant les configurations déclaratives pour toutes les applications et tous les environnements.
+- Actualisation : Une actualisation se produit lorsqu'Argo récupère l'état cible de votre dépôt. Il compare les modifications à l'état actuel, mais ne les applique pas nécessairement à ce stade.
+- Synchronisation : Une synchronisation consiste à appliquer les modifications détectées lors d'une actualisation. Chaque synchronisation ramène le cluster à son état cible.
+- Serveur API : Le serveur API Argo fournit l’interface API REST et gRPC utilisée par la CLI, l’interface utilisateur Web et les intégrations externes.
+- Référentiel Git : Le référentiel Git agit comme la source unique de vérité, stockant les configurations déclaratives pour toutes les applications et tous les environnements.
+
 Maintenant que nous avons abordé les concepts fondamentaux, nous pouvons déployer un exemple d'application sur Kubernetes avec Argo. La documentation officielle explique la terminologie et l'architecture d'Argo .
 
 Comment fonctionne Argo CD ?
