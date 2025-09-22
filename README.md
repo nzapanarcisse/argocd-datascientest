@@ -1,4 +1,4 @@
-# Cours Complet ArgoCD : De la Théorie à la Production avec GitOps
+# ARGO CD
 
 ![ArgoCD Logo](https://raw.githubusercontent.com/argoproj/argo-cd/master/docs/assets/argo.png)
 
