@@ -79,6 +79,17 @@ Argo CD est principalement utilisé par les ingénieurs DevOps, les équipes de 
 
 Le modèle GitOps est essentiel à la conception d'Argo CD. Il fait du dépôt la source unique de l'état souhaité de votre application. Votre dépôt doit contenir tous les manifestes Kubernetes, les modèles Kustomize, les charts Helm et les fichiers de configuration nécessaires à votre application. Ces ressources définissent les conditions d'un déploiement réussi de votre application.
 
+Argo compare l'état déclaré à ce qui s'exécute réellement dans votre cluster et applique les modifications appropriées pour corriger les écarts. Ce processus peut être configuré pour s'exécuter automatiquement, empêchant ainsi votre cluster de s'éloigner de votre référentiel. Argo resynchronise l'état dès que des différences surviennent, par exemple après l'exécution manuelle de commandes Kubectl.
+
+Argo est doté d'une interface en ligne de commande (CLI) et d'une interface web. Il prend en charge les environnements multi-locataires et multi-clusters, s'intègre aux fournisseurs d'authentification unique (SSO), génère une piste d'audit et peut mettre en œuvre des stratégies de déploiement complexes telles que les déploiements Canary et les mises à niveau Blue/Green . Il offre également des fonctions de restauration intégrées pour une reprise rapide après un échec de déploiement.
+
+CI/CD basé sur le push ou le pull
+Historiquement, la plupart des implémentations CI/CD reposaient sur un comportement poussé. Cela nécessite de connecter votre cluster à votre plateforme CI/CD et d'utiliser des outils comme Kubectl et Helm dans votre pipeline pour appliquer les modifications Kubernetes.
+
+Argo CD est un système CI/CD basé sur le pull. Il s'exécute dans votre cluster Kubernetes et récupère les sources de vos dépôts. Argo applique ensuite les modifications automatiquement, sans pipeline configuré manuellement.
+
+Ce modèle est plus sécurisé que les workflows push. Vous n'avez pas besoin d'exposer le serveur d'API de votre cluster ni de stocker les identifiants Kubernetes sur votre plateforme CI/CD. Compromettre un dépôt source ne fait que donner à un attaquant l'accès à votre code, au lieu de lui donner accès à vos déploiements en production.
+
 Dans un pipeline CI/CD "classique", c'est souvent le serveur de CI (Jenkins, GitLab CI, GitHub Actions) qui, après avoir construit une image, la "pousse" vers Kubernetes à l'aide de `kubectl apply` ou `helm upgrade`.
 
 **Cette approche (Push) présente des défis :**
