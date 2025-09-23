@@ -35,7 +35,7 @@ Les participants doivent disposer des prérequis suivants :
 
 - Une compréhension générale du développement logiciel ainsi que des workflows CI/CD.
 
-## 1. Introduction : Pourquoi ArgoCD dans une démarche DevOps ?
+## 1. Introduction 
 Argo CD est un outil déclaratif de livraison continue basé sur GitOps pour Kubernetes. Il surveille vos dépôts sources et déploie automatiquement les modifications sur votre cluster.
 
 Kubernetes orchestre les tâches de déploiement et de gestion des conteneurs. Il démarre les conteneurs, les remplace en cas de panne, et ajuste les services en fonction des nœuds de calcul du cluster.
