@@ -70,7 +70,6 @@ Argo CD est facile à prendre en main une fois ses concepts de base compris. Voi
 - Serveur API : Le serveur API Argo fournit l’interface API REST et gRPC utilisée par la CLI, l’interface utilisateur Web et les intégrations externes.
 - Référentiel Git : Le référentiel Git agit comme la source unique de vérité, stockant les configurations déclaratives pour toutes les applications et tous les environnements.
 
-Maintenant que nous avons abordé les concepts fondamentaux, nous pouvons déployer un exemple d'application sur Kubernetes avec Argo. La documentation officielle explique la terminologie et l'architecture d'Argo .
 
 Comment fonctionne Argo CD ?
 Argo CD est principalement utilisé par les ingénieurs DevOps, les équipes de plateforme et les administrateurs Kubernetes qui doivent gérer les déploiements d'applications dans un flux de travail piloté par GitOps.
@@ -106,7 +105,7 @@ Le dépôt **Git est la seule et unique source de vérité** (`Single Source of 
 *   **Détection de la dérive (Drift Detection) :** Toute modification manuelle sur le cluster est immédiatement détectée (et peut être automatiquement annulée).
 *   **Expérience développeur améliorée :** Les développeurs n'ont plus besoin de connaître `kubectl`. Ils font ce qu'ils savent faire : une `pull request`.
 
-## 2. Architecture et Fonctionnement
+## b. Architecture et Fonctionnement
 
 ArgoCD est simple mais puissant. Il repose sur 3 composants principaux :
 
