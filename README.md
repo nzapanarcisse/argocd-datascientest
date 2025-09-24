@@ -36,6 +36,10 @@ Les participants doivent disposer des prérequis suivants :
 - Une compréhension générale du développement logiciel ainsi que des workflows CI/CD.
 
 ## a. Introduction 
+
+![](https://miro.medium.com/v2/resize:fit:875/1*bJjRKI-zHbTa3n86rIwbXQ.png)
+
+
 Argo CD est un outil déclaratif de livraison continue basé sur GitOps pour Kubernetes. Il surveille vos dépôts sources et déploie automatiquement les modifications sur votre cluster.
 
 Kubernetes orchestre les tâches de déploiement et de gestion des conteneurs. Il démarre les conteneurs, les remplace en cas de panne, et ajuste les services en fonction des nœuds de calcul du cluster.
@@ -106,6 +110,9 @@ Le dépôt **Git est la seule et unique source de vérité** (`Single Source of 
 *   **Expérience développeur améliorée :** Les développeurs n'ont plus besoin de connaître `kubectl`. Ils font ce qu'ils savent faire : une `pull request`.
 
 ## b. Architecture et Fonctionnement
+
+<img width="875" height="595" alt="image" src="https://github.com/user-attachments/assets/1abfd7b2-43d4-4fe1-8e4c-430e09a0f6d3" />
+
 
 ArgoCD est simple mais puissant. Il repose sur 3 composants principaux :
 
@@ -227,7 +234,7 @@ Connectez-vous. Vous êtes sur le tableau de bord d'ArgoCD !
 <img width="1911" height="778" alt="image" src="https://github.com/user-attachments/assets/33bb4545-1e3e-4163-b3c7-8a9bf0d6fbf3" />
 
 
-## 4. Atelier 2 : Déploiement d'Applications 
+## 4. cas pratique 1 : Déploiement d'Applications 
 
 ArgoCD est extrêmement flexible. Il peut déployer des applications à partir de différentes sources de manifestes. Dans cet atelier, nous allons explorer les scénarios courants qui illustrent cette flexibilité à savoir helm et les manifest yaml.
 
@@ -419,13 +426,16 @@ Ouvrez le navigateur et allez sur `[http://VOTRE_IP_PUBLIC:30001](https://54.234
 <img width="1882" height="915" alt="image" src="https://github.com/user-attachments/assets/19a62dc2-1e08-4e0b-8d9f-14601191796d" />
 
 
-## 5. Atelier 3 : Automatisation Complète avec un Pipeline CI/CD GitOps
+## 5. cas pratique 2 : Automatisation Complète avec un Pipeline CI/CD GitOps
 
 **Le Contexte : Passer à la Vitesse Supérieure**
 
 Félicitations ! Dans l'atelier précédent, nous avons déployé notre application web de deux manières différentes. C'était une étape cruciale pour comprendre le fonctionnement d'ArgoCD. Cependant, le processus était encore manuel. Un développeur modifiait le code, puis un membre de l'équipe DevOps devait manuellement créer une nouvelle image, la pousser, et mettre à jour la configuration dans le dépôt GitOps.
 
 Ce processus est lent, source d'erreurs et ne correspond pas à la vélocité attendue d'une équipe moderne. La direction souhaite maintenant une **automatisation de bout en bout**. L'objectif est simple : **lorsqu'un développeur pousse une modification du code de l'application, celle-ci doit être testée, sécurisée et déployée en production en quelques minutes, sans aucune intervention manuelle.**
+
+![](https://miro.medium.com/v2/resize:fit:875/1*HGBcQQTfbjnn9NrnbFB1mw.png)
+
 
 C'est ici que la magie du CI/CD couplé au GitOps opère. Nous allons construire un pipeline avec GitHub Actions qui orchestrera tout ce processus.
 
