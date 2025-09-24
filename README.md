@@ -111,6 +111,7 @@ Le dépôt **Git est la seule et unique source de vérité** (`Single Source of 
 
 ## b. Architecture et Fonctionnement
 
+
 <img width="875" height="595" alt="image" src="https://github.com/user-attachments/assets/1abfd7b2-43d4-4fe1-8e4c-430e09a0f6d3" />
 
 
