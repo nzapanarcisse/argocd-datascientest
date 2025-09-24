@@ -114,6 +114,7 @@ Le dépôt **Git est la seule et unique source de vérité** (`Single Source of 
 <img width="875" height="595" alt="image" src="https://github.com/user-attachments/assets/1abfd7b2-43d4-4fe1-8e4c-430e09a0f6d3" />
 
 
+
 ArgoCD est simple mais puissant. Il repose sur 3 composants principaux :
 
 1.  **API Server :** C'est la porte d'entrée. Elle expose une API gRPC/REST qui est utilisée par l'interface web (UI), la CLI (`argocd`), et les webhooks (mécanisme qui permet à une application d'envoyer automatiquement des données à une autre application dès qu’un événement spécifique se produit. C’est une sorte de notification en temps réel envoyée via HTTP). Elle gère l'authentification, les autorisations et la coordination des autres services.
